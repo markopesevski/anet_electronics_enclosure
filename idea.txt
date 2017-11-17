@@ -1,0 +1,1 @@
+fer que es pugui obrir (amb una frontissa) el costat que queda de fora (on està el ventilador), i el costat on hi hauria més proper el cable USB raspberry-mega
