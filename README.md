@@ -4,5 +4,5 @@ Enclosure for the Anet A8 electronics I am designing. Designed to be printed on 
 
 ## TODO
 
-* separar els suports de cada placa entre si i fer que s'agafin amb 4 clips (2 per costat) a la caixa, on hi haura una repisa
-* afegir una repisa a la caixa de panal d'abella perque els clips puguin clipar
+* add clips to the outside honeycomb enclosure for grabbing the frame of the printer
+* try to save any space possible to make the honeycomb enclosure a little lower (faster to print)
