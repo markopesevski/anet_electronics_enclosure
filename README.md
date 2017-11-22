@@ -6,3 +6,7 @@ Enclosure for the Anet A8 electronics I am designing. Designed to be printed on 
 
 * add clips to the outside honeycomb enclosure for grabbing the frame of the printer
 * try to save any space possible to make the honeycomb enclosure a little lower (faster to print)
+* think about cable management
+* THINK ABOUT CABLE MANAGEMENT
+* make clips for PCBs a little higher than PCB itself to produce better results when printing (account for tolerances and stuff)
+
