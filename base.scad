@@ -11,17 +11,17 @@ include <nema17.scad>
 $fn=20;
 motor_height = 37.0;
 clips = "yes";
-clips_on_honeycomb = "no";
+clips_on_honeycomb = "yes";
 honeycomb_casing = "no";
-pcbs = "yes";
-fan = "no";
-small_mosfet = "no";
-anet = "no";
-motor = "no";
+pcbs = "no";
+fan = "yes";
+small_mosfet = "yes";
+anet = "yes";
+motor = "yes";
 
 if(anet == "yes")
 {
-	import("anet_a8_whole.stl");
+	%import("anet_a8_whole.stl");
 }
 
 // translate([0,245.25,0])
