@@ -10,14 +10,57 @@ include <nema17.scad>
 
 $fn=20;
 motor_height = 37.0;
-clips = "yes";
+clips = "no";
 clips_on_honeycomb = "yes";
-honeycomb_casing = "no";
-pcbs = "no";
+honeycomb_casing = "yes";
+pcbs = "yes";
 fan = "yes";
 small_mosfet = "yes";
 anet = "yes";
 motor = "yes";
+
+//
+//                      case_top_width
+//                        /______/ < case_depth
+//                       /       |
+//                      /        |
+//                     /         |
+//                    /          | case_height
+//                   /           |
+//                  |            |
+// case_height_left |            |
+//                  |____________|
+//                    case_width
+//
+//
+angle = 12;
+case_depth = 83;
+case_height = 210;
+case_height_left = 30;
+case_width = 130;
+case_top_width = case_width - (sin(angle)*(case_height - case_height_left))/(sin(90-angle));
+honeycomb_diameter = 8;
+honeycomb_wall = 2;
+inset_from_anet_wall = -5;
+outline_walls = 3;
+
+
+
+
+fan_housing_size=80;
+fan_housing_height=15;
+fan_housing_mount_tab_thickness_ratio=0.23333;
+fan_blade_count=9;
+fan_blade_direction=-1;
+fan_blade_twist_ratio=0.58;
+fan_blade_thickness=1.5;
+fan_blade_edge_gap=0.75;
+fan_hub_diameter_to_housing_ratio=0.525;
+fan_mount_hole_diameter=3.4;
+
+
+
+
 
 if(anet == "yes")
 {
@@ -36,21 +79,21 @@ if(anet == "yes")
 // 	translate([0,47,341])rotate([0,90,0])cylinder(h = 500, d = 3, center = true, $fn = 20);
 // }
 
+if(motor == "yes")
+{
+	translate([-238,257,151]) rotate([90,0,0]) %Nema17(motor_height);
+}
+
 translate([-148,382,16]) rotate([90,0,270])
 union()
 {
-	if(motor == "yes")
-	{
-		translate([125,135,90]) rotate([0,90,0]) %Nema17(motor_height);
-	}
-
 	if(fan == "yes")
 	{
-		translate([80,60,82.5]) rotate([0,180,90])
+		translate([80, 60, 73.5]) rotate([0,180,90])
 		{
 			if(pcbs == "yes")
 			{
-				color("grey", 0.5) fan_parametric(housing_size=80, housing_height=15, housing_mount_tab_thickness_ratio=0.23333, fan_blade_count=9, fan_blade_direction=-1, fan_blade_twist_ratio=0.58, fan_blade_thickness=1.5, fan_blade_edge_gap=0.75, hub_diameter_to_housing_ratio=0.525, mount_hole_diameter=3.4);
+				color("grey", 0.5) fan_parametric(fan_housing_size, fan_housing_height, fan_housing_mount_tab_thickness_ratio, fan_blade_count, fan_blade_direction, fan_blade_twist_ratio, fan_blade_thickness, fan_blade_edge_gap, fan_hub_diameter_to_housing_ratio, fan_mount_hole_diameter);
 			}
 			if(clips_on_honeycomb == "yes")
 			{
@@ -76,48 +119,52 @@ union()
 		{
 			union()
 			{
-				translate([35,210,-5]) rotate([90,0,0]) linear_extrude(2) honeycomb(100,95,8,2); /* top */
-				translate([0,0,-5]) rotate([90,0,0]) linear_extrude(2) honeycomb(135,95,8,2); /* bottom */
-				translate([0,0,60+30]) rotate([0,90,0]) linear_extrude(2) honeycomb(95,30,8,2); /* bottom back */
-				translate([135,0,60+30]) rotate([0,90,0]) linear_extrude(2) honeycomb(95,210,8,2); /* front */
-				translate([0,30,60+30]) rotate([0,90,-12]) linear_extrude(2) honeycomb(95,185,8,2); /* top back */
-				translate([0,0,60+30]) rotate([0,0,0]) linear_extrude(2) honeycomb(135,210,8,2); /* outside */
-				translate([35,207,89]) cube([100,3,3]);
-				translate([35,207,-6]) cube([100,3,3]);
-				translate([0,1,89]) rotate([90,0,0]) cube([137,3,3]);
-				translate([0,37,89]) rotate([0,0,-90]) cube([37,3,3]);
-				translate([137,0,89]) rotate([0,0,90]) cube([110,3,3]);
-				translate([137,107,89]) rotate([0,90,90]) cube([30,3,3]);
-				translate([137,107,59]) rotate([0,0,90]) cube([56,3,3]);
-				translate([137,160,89]) rotate([0,90,90]) cube([30,3,3]);
-				translate([137,160,89]) rotate([0,0,90]) cube([50,3,3]);
-				translate([120,107,89]) rotate([0,0,0]) cube([14,3,3]);
-				translate([120,107,89]) rotate([0,0,90]) cube([56,3,3]);
-				translate([120,160,89]) rotate([0,0,0]) cube([14,3,3]);
-				translate([2,30,89]) rotate([0,0,90-12]) cube([185,3,3]);
-				translate([2,30,-6]) rotate([0,0,90-12]) cube([185,3,3]); /**/
-				translate([3,30,10]) rotate([0,0,90-12]) cube([185,3,3]); /* inside flange for PCBs */
-				translate([0,28.5,89]) rotate([0,90,0]) cube([92,3,3]);
-				translate([0,-2,89]) rotate([0,90,0]) cube([92,3,3]);
-				translate([37.25,207,89]) rotate([0,90,0]) cube([92,3,3]);
-				translate([36.75,207,89]) rotate([0,90,-12]) cube([92,3,3]);
-				translate([134,207,89]) rotate([0,90,0]) cube([92,3,3]);
-				translate([134,-2,89]) rotate([0,90,0]) cube([92,3,3]);
-				translate([137,0,-6]) rotate([0,0,90]) cube([210,3,3]); /**/
-				translate([136,0,10]) rotate([0,0,90]) cube([210,3,3]); /* inside flange for PCBs */
-				translate([3,-2,-6]) rotate([0,0,90]) cube([37,3,3]); /**/
-				translate([3,-2,10]) rotate([0,0,90]) cube([33,3,3]); /* inside flange for PCBs */
-				translate([0,-2,-6]) rotate([0,0,0]) cube([137,3,3]);
-				translate([135,54,47.5]) rotate([0,90,0]) mirror() cylinder(h=2, d=19, center=false, $fn=20);
+				translate([case_width - case_top_width,case_height,-outline_walls]) rotate([90,0,0]) linear_extrude(honeycomb_wall) honeycomb(case_top_width,case_depth,honeycomb_diameter,honeycomb_wall); /* top */
+				translate([0,-outline_walls+honeycomb_wall,-outline_walls]) rotate([90,0,0]) linear_extrude(honeycomb_wall) honeycomb(case_width,case_depth,honeycomb_diameter,honeycomb_wall); /* bottom */
+				translate([0,0,-outline_walls]) rotate([0,90,0]) mirror() linear_extrude(honeycomb_wall) honeycomb(case_depth,case_height_left,honeycomb_diameter,honeycomb_wall); /* bottom back */
+				translate([case_width+outline_walls-honeycomb_wall,0,-outline_walls]) rotate([0,90,0]) mirror() linear_extrude(honeycomb_wall) honeycomb(case_depth,case_height,honeycomb_diameter,honeycomb_wall); /* front */
+				translate([-outline_walls+honeycomb_wall,case_height_left,-outline_walls]) rotate([0,90,-angle]) mirror() linear_extrude(honeycomb_wall) honeycomb(case_depth,case_height - case_height_left,honeycomb_diameter,honeycomb_wall); /* top back */
+				translate([0,0,case_depth - honeycomb_wall]) linear_extrude(honeycomb_wall) honeycomb(case_width,case_height,honeycomb_diameter,honeycomb_wall); /* outside */
+				translate([case_width - case_top_width,case_height-outline_walls,case_depth-outline_walls]) cube([case_top_width,outline_walls,outline_walls]);
+				translate([case_width - case_top_width,case_height-outline_walls,inset_from_anet_wall-1]) cube([case_top_width,outline_walls,outline_walls]);
+				translate([0,0,case_depth-outline_walls]) rotate([90,0,0]) cube([case_width+outline_walls,outline_walls,outline_walls]);
+				translate([0,0,case_depth-outline_walls]) rotate([0,0,-90]) mirror() cube([case_height_left+outline_walls,outline_walls,outline_walls]);
+
+				translate([case_width+outline_walls,0,case_depth-outline_walls]) rotate([0,0,90]) cube([110,outline_walls,outline_walls]); /* 110, to accept motor */
+				translate([case_width+outline_walls,107,case_depth-outline_walls]) rotate([0,90,90]) cube([20,outline_walls,outline_walls]); /* 20, to accept motor */
+				translate([case_width+outline_walls,107,57]) rotate([0,0,90]) cube([56,outline_walls,outline_walls]); /* 56, to accept motor */
+				translate([case_width+outline_walls,160,case_depth-outline_walls]) rotate([0,90,90]) cube([20,outline_walls,outline_walls]); /* 20, to accept motor */
+				translate([case_width+outline_walls,160,case_depth-outline_walls]) rotate([0,0,90]) cube([50,outline_walls,outline_walls]); /* 50, to accept motor */
+				translate([120,107,case_depth-outline_walls]) cube([13,outline_walls,outline_walls]); /* 13, to accept motor */
+				translate([120,107,case_depth-outline_walls]) rotate([0,0,90]) cube([56,outline_walls,outline_walls]); /* 56, to accept motor */
+				translate([120,160,case_depth-outline_walls]) cube([13,outline_walls,outline_walls]); /* 13, to accept motor */
+
+				translate([2,case_height_left,case_depth-outline_walls]) rotate([0,0,90-angle]) cube([sqrt(pow(case_height - case_height_left,2)+pow(case_width - case_top_width,2)),outline_walls,outline_walls]);
+				translate([2,case_height_left,inset_from_anet_wall-1]) rotate([0,0,90-angle]) cube([sqrt(pow(case_height - case_height_left,2)+pow(case_width - case_top_width,2)),outline_walls,outline_walls]); /**/
+				translate([0,case_height_left+honeycomb_wall,case_depth-outline_walls]) rotate([0,90,0]) cube([case_depth+outline_walls,outline_walls,outline_walls]);
+				translate([0,-outline_walls,case_depth-outline_walls]) rotate([0,90,0]) cube([case_depth+outline_walls,outline_walls,outline_walls]);
+				translate([/*37.25*/ case_width - case_top_width,case_height-outline_walls,case_depth-outline_walls]) mirror() rotate([0,90,0]) cube([case_depth+outline_walls,outline_walls,outline_walls]);
+				translate([/*36.75*/ case_width - case_top_width,case_height-outline_walls,case_depth-outline_walls]) mirror() rotate([0,90,angle]) cube([case_depth+outline_walls,outline_walls,outline_walls]);
+				translate([case_width,case_height-outline_walls,case_depth-outline_walls]) rotate([0,90,0]) cube([case_depth+outline_walls,outline_walls,outline_walls]);
+				translate([case_width,-outline_walls,case_depth-outline_walls]) rotate([0,90,0]) cube([case_depth+outline_walls,outline_walls,outline_walls]);
+
+				translate([case_width+outline_walls,0,inset_from_anet_wall-1]) rotate([0,0,90]) cube([case_height,outline_walls,outline_walls]); /**/
+				translate([outline_walls,-outline_walls,inset_from_anet_wall-1]) rotate([0,0,90]) cube([case_width - case_top_width,outline_walls,outline_walls]); /**/
+				translate([outline_walls,case_height_left,-(inset_from_anet_wall*2)]) rotate([0,0,90-angle]) cube([sqrt(pow(case_height - case_height_left,2)+pow(case_width - case_top_width,2)),outline_walls,outline_walls]); /* inside flange for PCBs */
+				translate([case_width+honeycomb_wall,0,-(inset_from_anet_wall*2)]) rotate([0,0,90]) cube([case_height,outline_walls,outline_walls]); /* inside flange for PCBs */
+				translate([outline_walls+1,-1,-(inset_from_anet_wall*2)]) rotate([0,0,90]) cube([case_height_left+outline_walls,outline_walls,outline_walls]); /* inside flange for PCBs */
+				translate([0,-outline_walls,inset_from_anet_wall-1]) cube([case_width+outline_walls,outline_walls,outline_walls]);
+				translate([case_width,54,47.5]) rotate([0,90,0]) mirror() cylinder(h=2, d=19, center=false, $fn=20); /* hole for cabling */
 			}
-			translate([-1,30,-10]) rotate([0,0,-12]) mirror() cube([100,200,120]);
-			translate([0,-2,-10]) rotate([0,0,0]) mirror() cube([100,100,120]);
-			translate([145,210,-10]) rotate([0,0,0]) mirror() cube([150,100,120]);
-			translate([145,110,60]) rotate([0,0,0]) mirror() cube([25,50,60]);
+			translate([-1,case_height_left,(inset_from_anet_wall*2)]) rotate([0,0,-angle]) mirror() cube([100,200,120]);
+			translate([0,(inset_from_anet_wall*2),(inset_from_anet_wall*2)]) mirror() cube([100,100,120]);
+			translate([0,case_height,(inset_from_anet_wall*2)]) cube([150,100,120]);
+			translate([145,110,60+outline_walls]) mirror() cube([25,50,60]);
 			translate([130,54,47.5]) rotate([0,90,0]) mirror() cylinder(h=30, d=14, center=false, $fn=20);
-			translate([96.5,-5.5,-10]) rotate([0,0,0]) mirror() cylinder(h=20, d=20, center=false, $fn=20);
-			translate([96.5+10,-2,-10]) rotate([0,0,0]) mirror() cube([3,3,20]);
-			translate([96.5-10,-2,10]) rotate([0,90,0]) mirror() cube([3,3,20]);
+			translate([96.5,-5.5,(inset_from_anet_wall*2)]) mirror() cylinder(h=20, d=20, center=false, $fn=20);
+			translate([125,135,90]) rotate([0,90,0]) Nema17(motor_height);
+			// translate([96.5+10,-2,(inset_from_anet_wall*2)]) mirror() cube([3,3,20]);
+			// translate([96.5-10,-2,-(inset_from_anet_wall*2)]) rotate([0,90,0]) mirror() cube([3,3,20]);
 		}
 	}
 
@@ -125,7 +172,7 @@ union()
 	// translate([-150,413,282]) rotate([90,0,270]) import("anet_a8.stl"); /* for developing holes */
 	translate([75,37,5]) rotate([0,0,90]) union()
 	{
-		// translate([0,0,28])rotate([90,0,0])ruler(40);
+		translate([0,0,20])rotate([90,0,0])ruler(40);
 		if(pcbs == "yes")
 		{
 			translate([-25.5,-52,1.75]) color("SteelBlue", 0.45) %import("mega.stl");
@@ -149,11 +196,11 @@ union()
 				translate([5,15,5]) cube([35,10,2]);
 				translate([5,15,5]) mirror() clip_single(clip_wall_depth = 2, clip_depth = 10, clip_height = 8, profile = [[0,0],[3.5,0],[0,4]]);
 				translate([114,15,5]) cube([17,10,2]);
-				translate([114+17,15+0,5+0]) rotate([0,0,0]) clip_single(clip_wall_depth = 2, clip_depth = 10, clip_height = 8, profile = [[0,0],[3.5,0],[0,4]]);
+				translate([114+17,15+0,5+0]) clip_single(clip_wall_depth = 2, clip_depth = 10, clip_height = 8, profile = [[0,0],[3.5,0],[0,4]]);
 				translate([6,30,5]) cube([30,10,2]);
 				translate([6,30,5]) rotate([0,0,-12]) mirror() clip_single(clip_wall_depth = 2, clip_depth = 10, clip_height = 8, profile = [[0,0],[3.5,0],[0,4]]);
 				translate([114,50,5]) cube([17,10,2]);
-				translate([114+17,50+0,5+0]) rotate([0,0,0]) clip_single(clip_wall_depth = 2, clip_depth = 10, clip_height = 8, profile = [[0,0],[3.5,0],[0,4]]);
+				translate([114+17,50+0,5+0]) clip_single(clip_wall_depth = 2, clip_depth = 10, clip_height = 8, profile = [[0,0],[3.5,0],[0,4]]);
 			}
 
 			translate([15,-40,0]) color("green") cube([10,75,2]);
@@ -189,9 +236,9 @@ union()
 			translate([-47,-138,-5]) color("green")
 			{
 				translate([124,175,5]) cube([7,10,2]);
-				translate([124+7,175+0,5+0]) rotate([0,0,0]) clip_single(clip_wall_depth = 2, clip_depth = 10, clip_height = 8, profile = [[0,0],[3.5,0],[0,4]]);
+				translate([124+7,175+0,5+0]) clip_single(clip_wall_depth = 2, clip_depth = 10, clip_height = 8, profile = [[0,0],[3.5,0],[0,4]]);
 				translate([124,150,5]) cube([7,10,2]);
-				translate([124+7,150+0,5+0]) rotate([0,0,0]) clip_single(clip_wall_depth = 2, clip_depth = 10, clip_height = 8, profile = [[0,0],[3.5,0],[0,4]]);
+				translate([124+7,150+0,5+0]) clip_single(clip_wall_depth = 2, clip_depth = 10, clip_height = 8, profile = [[0,0],[3.5,0],[0,4]]);
 				translate([37,180,5]) cube([10,10,2]);
 				translate([37,180,5]) rotate([0,0,-12]) mirror() clip_single(clip_wall_depth = 2, clip_depth = 10, clip_height = 8, profile = [[0,0],[3.5,0],[0,4]]);
 				translate([29.5,145,5]) cube([17.5,10,2]);
@@ -229,9 +276,9 @@ union()
 				translate([15.5,80,5]) cube([35,10,2]);
 				translate([15.5,80,5]) rotate([0,0,-12]) mirror() clip_single(clip_wall_depth = 2, clip_depth = 10, clip_height = 8, profile = [[0,0],[3.5,0],[0,4]]);
 				translate([110,80,5]) cube([22,10,2]);
-				translate([110+22,80+0,5+0]) rotate([0,0,0]) clip_single(clip_wall_depth = 2, clip_depth = 10, clip_height = 8, profile = [[0,0],[3.5,0],[0,4]]);
+				translate([110+22,80+0,5+0]) clip_single(clip_wall_depth = 2, clip_depth = 10, clip_height = 8, profile = [[0,0],[3.5,0],[0,4]]);
 				translate([110,110,5]) cube([22,10,2]);
-				translate([110+22,110+0,5+0]) rotate([0,0,0]) clip_single(clip_wall_depth = 2, clip_depth = 10, clip_height = 8, profile = [[0,0],[3.5,0],[0,4]]);
+				translate([110+22,110+0,5+0]) clip_single(clip_wall_depth = 2, clip_depth = 10, clip_height = 8, profile = [[0,0],[3.5,0],[0,4]]);
 			}
 
 			translate([2.5,5,0]) color("green") cube([60,10,2]);
@@ -241,7 +288,7 @@ union()
 
 	if(small_mosfet == "yes")
 	{
-		translate([20,205,96]) rotate([180,0,270])
+		translate([20,205,88]) rotate([180,0,270])
 		{
 			if(pcbs == "yes")
 			{
