@@ -10,13 +10,14 @@ include <nema17.scad>
 
 $fn=20;
 motor_height = 37.0;
-clips = "no";
+clips = "yes";
 clips_on_honeycomb = "yes";
 honeycomb_casing = "yes";
+honeycombs = "yes";
 pcbs = "yes";
 fan = "yes";
 small_mosfet = "yes";
-anet = "yes";
+anet = "no";
 motor = "yes";
 
 //
@@ -84,7 +85,7 @@ if(motor == "yes")
 	translate([-238,257,151]) rotate([90,0,0]) %Nema17(motor_height);
 }
 
-translate([-148,382,16]) rotate([90,0,270])
+translate([-149,382,16]) rotate([90,0,270])
 union()
 {
 	if(fan == "yes")
@@ -119,12 +120,16 @@ union()
 		{
 			union()
 			{
-				translate([case_width - case_top_width,case_height,-outline_walls]) rotate([90,0,0]) linear_extrude(honeycomb_wall) honeycomb(case_top_width,case_depth,honeycomb_diameter,honeycomb_wall); /* top */
-				translate([0,-outline_walls+honeycomb_wall,-outline_walls]) rotate([90,0,0]) linear_extrude(honeycomb_wall) honeycomb(case_width,case_depth,honeycomb_diameter,honeycomb_wall); /* bottom */
-				translate([0,0,-outline_walls]) rotate([0,90,0]) mirror() linear_extrude(honeycomb_wall) honeycomb(case_depth,case_height_left,honeycomb_diameter,honeycomb_wall); /* bottom back */
-				translate([case_width+outline_walls-honeycomb_wall,0,-outline_walls]) rotate([0,90,0]) mirror() linear_extrude(honeycomb_wall) honeycomb(case_depth,case_height,honeycomb_diameter,honeycomb_wall); /* front */
-				translate([-outline_walls+honeycomb_wall,case_height_left,-outline_walls]) rotate([0,90,-angle]) mirror() linear_extrude(honeycomb_wall) honeycomb(case_depth,case_height - case_height_left,honeycomb_diameter,honeycomb_wall); /* top back */
-				translate([0,0,case_depth - honeycomb_wall]) linear_extrude(honeycomb_wall) honeycomb(case_width,case_height,honeycomb_diameter,honeycomb_wall); /* outside */
+				if(honeycombs == "yes")
+				{
+					translate([case_width - case_top_width,case_height,-outline_walls]) rotate([90,0,0]) linear_extrude(honeycomb_wall) honeycomb(case_top_width,case_depth,honeycomb_diameter,honeycomb_wall); /* top */
+					translate([0,-outline_walls+honeycomb_wall,-outline_walls]) rotate([90,0,0]) linear_extrude(honeycomb_wall) honeycomb(case_width,case_depth,honeycomb_diameter,honeycomb_wall); /* bottom */
+					// translate([0,0,-outline_walls]) rotate([0,90,0]) mirror() linear_extrude(honeycomb_wall) honeycomb(case_depth,case_height_left,honeycomb_diameter,honeycomb_wall); /* bottom back */
+					translate([case_width+outline_walls-honeycomb_wall,0,-outline_walls]) rotate([0,90,0]) mirror() linear_extrude(honeycomb_wall) honeycomb(case_depth,case_height,honeycomb_diameter,honeycomb_wall); /* front */
+					// translate([-outline_walls+honeycomb_wall,case_height_left,-outline_walls]) rotate([0,90,-angle]) mirror() linear_extrude(honeycomb_wall) honeycomb(case_depth,case_height - case_height_left+3,honeycomb_diameter,honeycomb_wall); /* top back */
+					translate([0,0,case_depth - honeycomb_wall]) linear_extrude(honeycomb_wall) honeycomb(case_width,case_height,honeycomb_diameter,honeycomb_wall); /* outside */
+				}
+
 				translate([case_width - case_top_width,case_height-outline_walls,case_depth-outline_walls]) cube([case_top_width,outline_walls,outline_walls]);
 				translate([case_width - case_top_width,case_height-outline_walls,inset_from_anet_wall-1]) cube([case_top_width,outline_walls,outline_walls]);
 				translate([0,0,case_depth-outline_walls]) rotate([90,0,0]) cube([case_width+outline_walls,outline_walls,outline_walls]);
@@ -155,14 +160,42 @@ union()
 				translate([outline_walls+1,-1,-(inset_from_anet_wall*2)]) rotate([0,0,90]) cube([case_height_left+outline_walls,outline_walls,outline_walls]); /* inside flange for PCBs */
 				translate([0,-outline_walls,inset_from_anet_wall-1]) cube([case_width+outline_walls,outline_walls,outline_walls]);
 				translate([case_width,54,47.5]) rotate([0,90,0]) mirror() cylinder(h=2, d=19, center=false, $fn=20); /* hole for cabling */
+				translate([96.5 + 8,-outline_walls,(inset_from_anet_wall)]) rotate([0,90,0]) mirror() cube([40,outline_walls,outline_walls]);
+				translate([96.5 - 8 - outline_walls,-outline_walls,(inset_from_anet_wall)]) rotate([0,90,0]) mirror() cube([40,outline_walls,outline_walls]);
+				translate([96.5 - 8 - outline_walls,-outline_walls,34]) cube([22,outline_walls,outline_walls]);
+
+				translate([115 - outline_walls, -8 + 10/2, 45.75]) rotate([0,90,0]) cube([34.5, outline_walls, outline_walls]);
+				translate([115 - outline_walls, -8 + 10/2 + outline_walls, 45.75]) rotate([90,0,0]) cube([21, outline_walls, outline_walls]);
+				translate([115 - outline_walls, -8 + 10/2 + outline_walls, 45.75 - 34.5 - outline_walls]) rotate([90,0,0]) cube([21, outline_walls, outline_walls]);
+
+				// translate([133 - outline_walls, 10, 45.75]) rotate([0,90,0]) cube([34.5, outline_walls, outline_walls]);
+				translate([136 - outline_walls, -8 + 10/2, 46.75 - 34.5 - outline_walls - 1]) rotate([0,0,90]) cube([16, outline_walls, 40]);
+
+				translate([0,47,22])rotate([0,90,0]) minkowski()
+				{
+					cube([10,10,10]);
+					cylinder(d=14,h=1);
+				}
 			}
 			translate([-1,case_height_left,(inset_from_anet_wall*2)]) rotate([0,0,-angle]) mirror() cube([100,200,120]);
+			translate([12,case_height_left,(inset_from_anet_wall*2)]) rotate([0,0,-angle]) mirror() cube([10,50,50]);
 			translate([0,(inset_from_anet_wall*2),(inset_from_anet_wall*2)]) mirror() cube([100,100,120]);
 			translate([0,case_height,(inset_from_anet_wall*2)]) cube([150,100,120]);
 			translate([145,110,60+outline_walls]) mirror() cube([25,50,60]);
-			translate([130,54,47.5]) rotate([0,90,0]) mirror() cylinder(h=30, d=14, center=false, $fn=20);
-			translate([96.5,-5.5,(inset_from_anet_wall*2)]) mirror() cylinder(h=20, d=20, center=false, $fn=20);
+			translate([120,54,47.5]) rotate([0,90,0]) mirror() cylinder(h=30, d=14, center=false, $fn=20);
+			translate([96.5,-5.5,(inset_from_anet_wall*2)]) mirror() cylinder(h=45, d=20, center=false, $fn=20);
 			translate([125,135,90]) rotate([0,90,0]) Nema17(motor_height);
+			translate([115,-9.5+10/2,45.75-10/2]) rotate([0,90,0]) minkowski()
+			{
+				cube([24.5,10,40]);
+				cylinder(d=10,h=1);
+			}
+
+			translate([0,47,22])rotate([0,90,0]) minkowski()
+			{
+				cube([10,10,10]);
+				cylinder(d=9,h=3);
+			}
 			// translate([96.5+10,-2,(inset_from_anet_wall*2)]) mirror() cube([3,3,20]);
 			// translate([96.5-10,-2,-(inset_from_anet_wall*2)]) rotate([0,90,0]) mirror() cube([3,3,20]);
 		}
