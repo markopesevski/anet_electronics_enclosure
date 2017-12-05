@@ -7,12 +7,11 @@ include <honeycomb.scad>
 // case_depth = 60;
 // angle = 12;
 // frame_wall = 3;
-
 // honeycomb_wall = 2;
 // honeycomb_diam = 8;
-// honeycomb_anet_casing(case_width, case_height, case_low_height, case_depth, angle, frame_wall, honeycomb_wall, honeycomb_diam);
+// anet_honeycomb_enclosure(case_width, case_height, case_low_height, case_depth, angle, frame_wall, honeycomb_wall, honeycomb_diam);
 
-module honeycomb_anet_casing(case_width = 130, case_height = 210, case_low_height = 35, case_depth = 60, angle = 12, frame_wall = 3, honeycomb_wall = 2, honeycomb_diam = 8)
+module anet_honeycomb_enclosure(case_width = 130, case_height = 210, case_low_height = 35, case_depth = 60, angle = 12, frame_wall = 3, honeycomb_wall = 2, honeycomb_diam = 8)
 {
 //
 //                        /______/ < case_depth
@@ -29,16 +28,16 @@ module honeycomb_anet_casing(case_width = 130, case_height = 210, case_low_heigh
 // LOOK AT IT ALL MIRRORED AND STUFF
 
 	alpha = 180-90-angle;
+	case_top_width = case_width - (((case_height - case_low_height) * sin(angle))/(sin(alpha)));
 	profile =
 	[
 		[0, 0],
 		[case_width, 0],
 		[case_width, case_height],
-		[(((case_height - case_low_height) * sin(angle))/(sin(alpha))), case_height],
+		[case_width - case_top_width, case_height],
 		[0, case_low_height],
 		[0, 0]
 	];
-
 
 	union()
 	{
@@ -78,12 +77,14 @@ module honeycomb_anet_casing(case_width = 130, case_height = 210, case_low_heigh
 			polygon(points = profile);
 
 			/* top face */
-			translate([frame_wall, 3*frame_wall, frame_wall])
-			resize(newsize=[case_width - (2*frame_wall), case_height - (2*frame_wall), case_depth - (2*frame_wall)])
-			linear_extrude(height = case_depth, center = false, convexity = 10, twist = 0, slices = 1, scale = 1.0)
-			polygon(points = profile);
+			translate([case_width - frame_wall, frame_wall, frame_wall])
+			// resize(newsize=[case_width - (2*frame_wall), case_height - (2*frame_wall), case_depth - (2*frame_wall)])
+			// #linear_extrude(height = case_depth, center = false, convexity = 10, twist = 0, slices = 1, scale = 1.0)
+			// polygon(points = profile);
+			mirror()
+			cube([case_top_width - frame_wall*2, case_height, case_depth - frame_wall*2]);
 
-			/*  */
+			/* right face */
 			translate([3*frame_wall, frame_wall, frame_wall])
 			resize(newsize=[case_width - (2*frame_wall), case_height - (2*frame_wall), case_depth - (2*frame_wall)])
 			linear_extrude(height = case_depth, center = false, convexity = 10, twist = 0, slices = 1, scale = 1.0)
@@ -97,36 +98,36 @@ module honeycomb_anet_casing(case_width = 130, case_height = 210, case_low_heigh
 			union()
 			{
 				/* bottom honeycomb */
-				translate([0, frame_wall, 0])
+				translate([0, frame_wall/2, 0])
 				rotate([90, 0, 0])
 				linear_extrude(honeycomb_wall)
 				honeycomb(case_width,case_depth,honeycomb_diam,honeycomb_wall);
 
 				/* front honeycomb */
-				translate([0, frame_wall, case_depth - frame_wall])
+				translate([0, frame_wall, case_depth - frame_wall + (frame_wall - honeycomb_wall)])
 				linear_extrude(honeycomb_wall)
 				honeycomb(case_width,case_height,honeycomb_diam,honeycomb_wall);
 
 				/* right honeycomb */
-				translate([case_width - (frame_wall - honeycomb_wall), 0, 0])
+				translate([case_width, 0, 0])
 				rotate([0, -90, 0])
 				linear_extrude(honeycomb_wall)
 				honeycomb(case_depth, case_height, honeycomb_diam, honeycomb_wall);
 
 				/* left low honeycomb */
-				translate([frame_wall, 0, 0])
+				translate([honeycomb_wall, 0, 0])
 				rotate([0, -90, 0])
 				linear_extrude(honeycomb_wall)
 				honeycomb(case_depth, case_height, honeycomb_diam, honeycomb_wall);
 
 				/* left high honeycomb */
-				translate([frame_wall/2 - (frame_wall - honeycomb_wall), case_low_height, 0])
+				translate([honeycomb_wall, case_low_height, 0])
 				rotate([0, -90, -angle])
 				linear_extrude(honeycomb_wall)
 				honeycomb(case_depth, case_height - case_low_height, honeycomb_diam, honeycomb_wall);
 
 				/* top honeycomb */
-				translate([0, case_height - (frame_wall - honeycomb_wall), 0])
+				translate([0, case_height, 0])
 				rotate([90, 0, 0])
 				linear_extrude(honeycomb_wall)
 				honeycomb(case_width, case_depth, honeycomb_diam, honeycomb_wall);
